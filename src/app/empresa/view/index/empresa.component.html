@@ -1,0 +1,88 @@
+<div class="container mt-4">
+    <div class="row d-flex justify-content-end">
+        <div class="col-auto w-auto">
+            <a class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#añadirEmpresa" *ngIf="loggedUser">Añadir empresa</a>
+        </div>
+    </div>
+    <div class="card my-3" *ngFor="let empresa of empresas">
+        <div class="card-header">
+            <h4>{{ empresa.nombre }}</h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><b>Descripcion: </b>{{ empresa.descripcion }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-end" *ngIf="loggedUser">
+            <button type="button" data-bs-toggle="modal" data-bs-target="#editEmpresa" (click)="updateModal(empresa)" class="btn btn-info mx-2">Editar</button>
+            <button type="button" (click)="borrar(empresa.id)" class="btn btn-danger mx-2">Borrar</button>
+        </div>
+    </div>
+</div>
+
+<!--Add form-->
+<div class="modal fade" id="añadirEmpresa" tabindex="-1" aria-bs-labelledby="añadirEmpresaLabel" aria-bs-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="añadirEmpresaLabel">Añadir Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="addEmpresaForm">
+                    <div class="form-group my-3">
+                        <label>Nombre</label>
+                        <input name="nombre" formControlName="nombre" placeholder="Nombre de la empresa"
+                            class="form-control">
+                    </div>
+                    <div class="form-group my-3">
+                        <label>Descripcion</label>
+                        <textarea name="descripcion" formControlName="descripcion" placeholder="Descripcion"
+                            class="form-control" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="save()" data-bs-dismiss="modal">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Update empresa-->
+<div class="modal fade" id="editEmpresa" tabindex="-1" aria-bs-labelledby="editEmpresaLabel" aria-bs-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content" *ngIf="updateEmpresa">
+        <div class="modal-header">
+            <h5 class="modal-title" id="añadirEmpresaLabel">Editar Empresa: {{updateEmpresa.nombre}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="updateEmpresaForm">
+                <input type="hidden" ngModel="{{updateEmpresa.id}}" name="id" class="form-control" id="id" formControlName="id">
+                <div class="form-group my-3">
+                    <label>Nombre</label>
+                    <input name="nombre" [(ngModel)]="updateEmpresa.nombre" formControlName="nombre" placeholder="Nombre de la empresa"
+                        class="form-control">
+                </div>
+                <div class="form-group my-3">
+                    <label>Descripcion</label>
+                    <textarea  [(ngModel)]="updateEmpresa.descripcion" name="descripcion" formControlName="descripcion" placeholder="Descripcion"
+                        class="form-control" rows="4"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Cerrar
+            </button>
+            <button type="button" class="btn btn-primary" (click)="update()" data-bs-dismiss="modal">
+                Guardar
+            </button>
+        </div>
+    </div>
+</div>
+</div>

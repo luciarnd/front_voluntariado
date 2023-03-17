@@ -6,8 +6,10 @@ import { AppComponent } from './app.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { VoluntariadoComponent } from './voluntariado/view/index/voluntariado.component';
+import { EmpresaComponent } from './empresa/view/index/empresa.component';
+import { AuthInterceptor } from './shared/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -16,15 +18,22 @@ import { VoluntariadoComponent } from './voluntariado/view/index/voluntariado.co
     SignupComponent,
     UserProfileComponent,
     VoluntariadoComponent,
+    EmpresaComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
