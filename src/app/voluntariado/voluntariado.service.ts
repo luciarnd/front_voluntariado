@@ -23,8 +23,8 @@ export class VoluntariadoService {
     return this.http.post('http://127.0.0.1:8000/api/voluntariado', voluntariado);
    }
 
-   update(voluntariado: Voluntariado, idVoluntariado: number): Observable<any> {
-    return this.http.put(`http://127.0.0.1:8000/api/voluntariado/${idVoluntariado}`, voluntariado);
+   update(voluntariado: Voluntariado): Observable<any> {
+    return this.http.put(`http://127.0.0.1:8000/api/voluntariado/${voluntariado.id}`, voluntariado);
    }
 
    delete(idVoluntariado: number): Observable<any> {

@@ -54,13 +54,13 @@ export class EmpresaComponent implements OnInit {
     this.empresaService.create(this.addEmpresaForm.value).subscribe(
       (result) => {
         console.log(result);
-        this.addEmpresaForm.reset();
         this.ngOnInit();
       },
       (error) => {
         this.errors = error.error;
       }
     );
+    this.addEmpresaForm.reset();
   }
 
   borrar(idEmpresa: number) {
@@ -80,7 +80,7 @@ export class EmpresaComponent implements OnInit {
   }
 
   update() {
-    this.empresaService.update(this.addEmpresaForm.value).subscribe(
+    this.empresaService.update(this.updateEmpresaForm.value).subscribe(
       (result) => {
         console.log(result);
         this.ngOnInit();
