@@ -10,14 +10,25 @@
 </div>
 
 <div class="container mt-5">
+      <div class="row d-flex justify-content-end">
+        <div class="col-auto w-auto mb-3">
+          <a class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#añadirVoluntariado" *ngIf="loggedUser">Añadir
+            voluntariado</a>
+        </div>
+      </div>
   <div class="card mb-3" *ngFor="let voluntariado of voluntariados">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between">
       <h4>{{ voluntariado.descripcion }}</h4>
+            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userInfo">Subscribirse</a>
     </div>
     <div class="card-body">
       <p class="card-text"><b>Ciudad: </b>{{ voluntariado.ciudad }}</p>
       <p class="card-text"><b>Empresa: </b>{{ voluntariado.empresa.nombre }}</p>
-      <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userInfo">Subscribirse</a>
+    </div>
+    <div class="card-footer d-flex justify-content-end" *ngIf="loggedUser">
+      <button type="button" data-bs-toggle="modal" data-bs-target="#editVoluntariado" (click)="updateModal(voluntariado)"
+        class="btn btn-info mx-2">Editar</button>
+      <button type="button" (click)="borrar(voluntariado.id)" class="btn btn-danger mx-2">Borrar</button>
     </div>
     <div class="modal fade" id="userInfo" tabindex="-1" aria-bs-labelledby="userInfoLabel" aria-bs-hidden="true">
       <div class="modal-dialog">
@@ -46,7 +57,11 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Cerrar
             </button>
+<<<<<<< HEAD
             <button type="button" class="btn btn-primary" (click)="existUser(voluntariado)">
+=======
+            <button type="button" class="btn btn-primary" (click)="userExist(voluntariado)">
+>>>>>>> 41756b473077f3539fac2e4afcb13a11758aa12f
               Subscribirse
             </button>
           </div>
@@ -54,4 +69,84 @@
       </div>
     </div>
   </div>
+  <!--Add form-->
+  <div class="modal fade" id="añadirVoluntariado" tabindex="-1" aria-bs-labelledby="añadirVoluntariadoLabel" aria-bs-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="añadirEmpresaLabel">Añadir Voluntariado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="addVoluntariadoForm">
+            <div class="form-group my-3">
+              <label>Ciudad</label>
+              <input name="ciudad" formControlName="ciudad" placeholder="Ciudad del voluntariado" class="form-control">
+            </div>
+            <div class="form-group my-3">
+              <label>Descripcion</label>
+              <textarea name="descripcion" formControlName="descripcion" placeholder="Descripcion" class="form-control"
+                rows="4"></textarea>
+            </div>
+            <div class="form-group my-3">
+              <label>Empresa</label>
+              <select name="empresa" formControlName="empresa"  class="form-control">
+                <option *ngFor="let empresa of empresas" value="{{empresa?.id}}" selected="selected">{{empresa?.nombre}}</option>"
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+          <button type="button" class="btn btn-primary" (click)="save()" data-bs-dismiss="modal">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!--Update voluntariado-->
+  <div class="modal fade" id="editVoluntariado" tabindex="-1" aria-bs-labelledby="editVoluntariadoLabel" aria-bs-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" *ngIf="updateVoluntariado">
+        <div class="modal-header">
+          <h5 class="modal-title" id="añadirEmpresaLabel">Editar Voluntariado: {{updateVoluntariado.descripcion}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="updateVoluntariadoForm">
+            <input type="hidden" ngModel="{{updateVoluntariado.id}}" name="id" class="form-control" id="id"
+              formControlName="id">
+            <div class="form-group my-3">
+              <label>Descripcion</label>
+              <textarea [(ngModel)]="updateVoluntariado.descripcion" name="descripcion" formControlName="descripcion"
+                placeholder="Descripcion" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="form-group my-3">
+              <label>Ciudad</label>
+              <input [(ngModel)]="updateVoluntariado.ciudad" name="ciudad" formControlName="ciudad"
+                placeholder="Ciudad" class="form-control">
+            </div>
+            <div class="form-group my-3">
+              <label>Empresa</label>
+              <select name="empresa" formControlName="empresa" class="form-control">
+                <option selected="selected">{{updateVoluntariado.empresa.nombre}}</option>
+                <option *ngFor="let empresa of empresas" value="{{empresa?.id}}" >{{empresa.nombre}}</option>"
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+          <button type="button" class="btn btn-primary" (click)="update()" data-bs-dismiss="modal">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
 </div>
