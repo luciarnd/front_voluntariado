@@ -13,7 +13,7 @@ export class VoluntariadoComponent implements OnInit{
   voluntariados!: Voluntariado[];
   errors: any = null;
   userForm: FormGroup;
-  user!: User;
+  userFound: boolean = false;
 
   constructor(private voluntariadoService: VoluntariadoService, private fb: FormBuilder, private authService: AuthService) {
     this.userForm = this.fb.group({
@@ -33,39 +33,53 @@ export class VoluntariadoComponent implements OnInit{
       console.log(data)
     })
   }
-  subscribe(valuntariado: Voluntariado) {
-    this.authService
-      .getUserByEmail(this.userForm.value.email)
-      .subscribe(result => {
-        this.user = result;
-      });
 
-        if (this.user != undefined) {
-          console.log(this.user);
-          this.voluntariadoService
-            .subscribirse(this.user.id, valuntariado.id)
-            .subscribe(
-              (result) => {
-                console.log(result);
-              },
-              (error) => {
-                this.errors = error.error;
-              }
-            );
-        } else {
-          this.authService.addUser(this.userForm.value).subscribe((result) => {
-            console.log(result);
-            this.voluntariadoService
-              .subscribirse(result.user.id, valuntariado.id)
-              .subscribe(
-                (result) => {
-                  console.log(result);
-                },
-                (error) => {
-                  this.errors = error.error;
-                }
-              );
-          });
+ existUser(voluntariado: Voluntariado) {
+    this.authService.getUserByEmail(this.userForm.value.email)
+      .subscribe(
+        (result) => {
+          console.log(result);
+          this.subscribeExistUser(voluntariado);
+        },
+        (error) => {
+          this.errors = error.error;
+          this.subscribeNonExistUser(voluntariado)
         }
+      )
+  }
+
+  subscribeExistUser(valuntariado: Voluntariado) {
+    this.authService.getUserByEmail(this.userForm.value.email)
+    .subscribe(
+      (result) => {
+      console.log(result);
+      this.voluntariadoService
+        .subscribirse(result.user.id, valuntariado.id)
+        .subscribe(
+          (result) => {
+            console.log(result);
+          },
+          (error) => {
+            this.errors = error.error;
+          }
+        );
+      }
+    );
+  }
+
+  subscribeNonExistUser(voluntariado: Voluntariado) {
+    this.authService.addUser(this.userForm.value).subscribe((result) => {
+      console.log(result);
+      this.voluntariadoService
+        .subscribirse(result.user.id, voluntariado.id)
+        .subscribe(
+          (result) => {
+            console.log(result);
+          },
+          (error) => {
+            this.errors = error.error;
+          }
+        );
+    });
   }
 }
