@@ -4,11 +4,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 // User interface
 export class User {
-id!: number;
-name!: String;
-email!: String;
-password!: String;
-password_confirmation!: String;
+  id!: number;
+  nombre!: String;
+  email!: String;
+  password!: String;
+  password_confirmation!: String;
 }
 
 @Injectable({

@@ -1,12 +1,8 @@
-
-<div *ngIf="errors?.email" class="alert alert-danger mt-3">
-  {{ errors?.email }}
+<div *ngIf="errors?.error" class="alert alert-danger mt-3">
+  {{ errors?.error }}
 </div>
-<div *ngIf="errors?.password" class="alert alert-danger mt-3">
-  {{ errors?.password }}
-</div>
-<div *ngIf="errors?.password_confirmation" class="alert alert-danger mt-3">
-  {{ errors?.password_confirmation }}
+<div *ngIf="messages?.message" class="alert alert-danger mt-3">
+  {{ messages?.message }}
 </div>
 
 <div class="container mt-5">
@@ -16,58 +12,113 @@
             voluntariado</a>
         </div>
       </div>
-  <div class="card mb-3" *ngFor="let voluntariado of voluntariados">
-    <div class="card-header d-flex justify-content-between">
-      <h4>{{ voluntariado.descripcion }}</h4>
-            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userInfo">Subscribirse</a>
-    </div>
-    <div class="card-body">
-      <p class="card-text"><b>Ciudad: </b>{{ voluntariado.ciudad }}</p>
-      <p class="card-text"><b>Empresa: </b>{{ voluntariado.empresa.nombre }}</p>
-    </div>
-    <div class="card-footer d-flex justify-content-end" *ngIf="loggedUser">
-      <button type="button" data-bs-toggle="modal" data-bs-target="#editVoluntariado" (click)="updateModal(voluntariado)"
-        class="btn btn-info mx-2">Editar</button>
-      <button type="button" (click)="borrar(voluntariado.id)" class="btn btn-danger mx-2">Borrar</button>
-    </div>
-    <div class="modal fade" id="userInfo" tabindex="-1" aria-bs-labelledby="userInfoLabel" aria-bs-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="userInfoLabel">Rellenar datos</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form [formGroup]="userForm">
-              <div class="form-group">
-                <label>Email</label>
-                <input name="email" formControlName="email" placeholder="Email" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Nombre</label>
-                <input name="nombre" formControlName="nombre" placeholder="Nombre" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Contraseña</label>
-                <input name="password" formControlName="password" placeholder="Contraseña" class="form-control" type="password">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Cerrar
-            </button>
-<<<<<<< HEAD
-            <button type="button" class="btn btn-primary" (click)="existUser(voluntariado)">
-=======
-            <button type="button" class="btn btn-primary" (click)="userExist(voluntariado)">
->>>>>>> 41756b473077f3539fac2e4afcb13a11758aa12f
-              Subscribirse
-            </button>
+  <div  *ngIf="!loggedUser">
+    <div class="card mb-3" *ngFor="let voluntariado of voluntariados">
+      <div class="card-header d-flex justify-content-between">
+        <h4>{{ voluntariado.descripcion }}</h4>
+              <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userInfo" (click)="openSuscribeModal(voluntariado)">Suscribirse</a>
+      </div>
+      <div class="card-body row">
+        <div class="col-9">
+          <p class="card-text"><b>Ciudad: </b>{{ voluntariado.ciudad }}</p>
+          <p class="card-text"><b>Empresa: </b>{{ voluntariado.empresa.nombre }}</p>
+        </div>
+        <div class="col-3 p-0">
+          <img class="card-img-right img-fluid rounded" src="http://localhost:8000/storage/{{voluntariado.image}}" alt="Card image">
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-end" *ngIf="loggedUser">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#editVoluntariado" (click)="updateModal(voluntariado)"
+          class="btn btn-info mx-2">Editar</button>
+        <button type="button" (click)="borrar(voluntariado.id)" class="btn btn-danger mx-2">Borrar</button>
+      </div>
+      <div class="modal fade" id="userInfo" tabindex="-1" aria-bs-labelledby="userInfoLabel" aria-bs-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content" *ngIf="suscribeVoluntariado">
+            <div class="modal-header">
+              <h5 class="modal-title" id="userInfoLabel">Rellenar datos</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form [formGroup]="userForm">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input name="email" formControlName="email" placeholder="Email" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Nombre</label>
+                  <input name="nombre" formControlName="nombre" placeholder="Nombre" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Contraseña</label>
+                  <input name="password" formControlName="password" placeholder="Contraseña" class="form-control" type="password">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Cerrar
+              </button>
+              <button type="button" class="btn btn-primary" (click)="existUser(suscribeVoluntariado)" data-bs-dismiss="modal">
+                Suscribirse
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div *ngIf="loggedUser">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Empresa</th>
+          <th scope="col">Acciones</th>
+          <th scope="col">Usuarios</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let voluntariado of voluntariados">
+          <th scope="row">{{voluntariado.id}}</th>
+          <td>{{voluntariado.descripcion}}</td>
+          <td>{{voluntariado.ciudad}}</td>
+          <td>{{voluntariado.empresa.nombre}}</td>
+          <td>
+            <button class="btn btn-sm btn-info ms-2"  (click)="updateModal(voluntariado)" data-bs-toggle="modal" data-bs-target="#editVoluntariado">
+              <i class="fa fa-edit fa-sm" style="color: white"></i>
+            </button>
+            <button class="btn btn-sm btn-danger ms-2" (click)="borrar(voluntariado.id)">
+              <i class="fa fa-trash fa-sm"></i>
+            </button>
+          </td>
+          <td>
+            <div class="accordion" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header p-1" id="headingOne">
+                  <button class="accordion-button collapsed p-2" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse'+voluntariado.id"
+                  [attr.aria-bs-controls]="'collapse'+ voluntariado.id" aria-expanded="false" (click)="getUserVoluntariado(voluntariado)">
+                    Abrir
+                  </button>
+                </h2>
+                <div id="collapse{{voluntariado.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <div *ngIf="users.length > 0">
+                      <p *ngFor="let user of users">{{user.nombre}}</p>
+                    </div>
+                    <div *ngIf="users.length == 0">
+                      <p>No data</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <!--Add form-->
   <div class="modal fade" id="añadirVoluntariado" tabindex="-1" aria-bs-labelledby="añadirVoluntariadoLabel" aria-bs-hidden="true">
@@ -94,6 +145,10 @@
                 <option *ngFor="let empresa of empresas" value="{{empresa?.id}}" selected="selected">{{empresa?.nombre}}</option>"
               </select>
             </div>
+            <div class="form-group my-3">
+              <label>Imagen</label>
+              <input type="file" name="image" formControlName="image" class="form-control" (change)="selectedImage($event)">
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -107,7 +162,7 @@
       </div>
     </div>
   </div>
-  
+
   <!--Update voluntariado-->
   <div class="modal fade" id="editVoluntariado" tabindex="-1" aria-bs-labelledby="editVoluntariadoLabel" aria-bs-hidden="true">
     <div class="modal-dialog">
@@ -132,10 +187,14 @@
             </div>
             <div class="form-group my-3">
               <label>Empresa</label>
-              <select name="empresa" formControlName="empresa" class="form-control">
-                <option selected="selected">{{updateVoluntariado.empresa.nombre}}</option>
-                <option *ngFor="let empresa of empresas" value="{{empresa?.id}}" >{{empresa.nombre}}</option>"
+              <select name="empresa_id" formControlName="empresa_id" class="form-control" [(ngModel)]="updateVoluntariado.empresa.id">
+                <option selected="selected" value="{{updateVoluntariado.empresa.id}}">{{updateVoluntariado.empresa.nombre}}</option>
+                <option *ngFor="let empresa of empresas" value="{{empresa?.id}}">{{empresa.nombre}}</option>"
               </select>
+            </div>
+            <div class="form-group my-3">
+              <label>Imagen</label>
+              <input type="file" name="image" formControlName="image" class="form-control" (change)="selectedImage($event)" id="fileupload">
             </div>
           </form>
         </div>

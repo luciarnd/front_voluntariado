@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { AuthService } from 'src/app/shared/auth.service';
+import { AuthService, User } from 'src/app/shared/auth.service';
 import { Voluntariado } from '../../voluntariado';
 import { VoluntariadoService } from '../../voluntariado.service';
 import { AuthStateService } from 'src/app/shared/auth-state.service';
@@ -16,11 +16,10 @@ export class VoluntariadoComponent implements OnInit {
   voluntariados!: Voluntariado[];
   empresas: Empresa[] = []
   errors: any = null;
-<<<<<<< HEAD
-  userForm: FormGroup;
-  userFound: boolean = false;
-=======
+  messages: any = null;
   loggedUser!: boolean;
+  users: User[] = [];
+  suscribeVoluntariado!: Voluntariado;
 
   userForm: FormGroup;
   addVoluntariadoForm!: FormGroup;
@@ -28,6 +27,7 @@ export class VoluntariadoComponent implements OnInit {
 
   user!: any;
   updateVoluntariado!: Voluntariado;
+  selectImage!: any;
 
   constructor(
     private voluntariadoService: VoluntariadoService,
@@ -40,7 +40,6 @@ export class VoluntariadoComponent implements OnInit {
       this.loggedUser = val;
       console.log(this.loggedUser);
     });
->>>>>>> 41756b473077f3539fac2e4afcb13a11758aa12f
 
     this.userForm = this.fb.group({
       email: [],
@@ -52,14 +51,16 @@ export class VoluntariadoComponent implements OnInit {
       ciudad: [],
       descripcion: [],
       id: [],
-      empresa: []
+      empresa: [],
+      image: []
     });
 
     this.updateVoluntariadoForm = this.fb.group({
       ciudad: [],
       descripcion: [],
       id: [],
-      empresa : [],
+      empresa_id : [],
+      image: []
     });
   }
 
@@ -74,32 +75,42 @@ export class VoluntariadoComponent implements OnInit {
       console.log(data);
     });
   }
-<<<<<<< HEAD
+
+  openSuscribeModal(voluntariado: Voluntariado) {
+    this.suscribeVoluntariado = voluntariado
+  }
 
  existUser(voluntariado: Voluntariado) {
     this.authService.getUserByEmail(this.userForm.value.email)
       .subscribe(
         (result) => {
-          console.log(result);
-          this.subscribeExistUser(voluntariado);
+          if(Object.keys(result).length !== 0) {
+            this.subscribeExistUser(voluntariado);
+          } else {
+            this.subscribeNonExistUser(voluntariado)
+          }
         },
         (error) => {
           this.errors = error.error;
-          this.subscribeNonExistUser(voluntariado)
         }
       )
   }
 
   subscribeExistUser(valuntariado: Voluntariado) {
-    this.authService.getUserByEmail(this.userForm.value.email)
-    .subscribe(
-      (result) => {
+    console.log(valuntariado)
+    this.authService.getUserByEmail(this.userForm.value.email).subscribe((result) => {
       console.log(result);
+      var id: number = result.map((item: { id: any; }) => {
+        return item.id;
+      });
       this.voluntariadoService
-        .subscribirse(result.user.id, valuntariado.id)
+        .subscribirse(parseInt(id.toString()), valuntariado.id)
         .subscribe(
           (result) => {
             console.log(result);
+            this.ngOnInit();
+            this.userForm.reset()
+            this.messages = result.message
           },
           (error) => {
             this.errors = error.error;
@@ -110,62 +121,48 @@ export class VoluntariadoComponent implements OnInit {
   }
 
   subscribeNonExistUser(voluntariado: Voluntariado) {
-=======
-
-  userExist(voluntariado: Voluntariado) {
-    this.authService
-      .getUserByEmail(this.userForm.value.email)
-      .subscribe((result) => {
-        this.user = result;
-        console.log(this.user);
-
-        if (this.user != undefined) {
-          this.subscribirse(voluntariado);
-        } else {
-          this.addUserSubscribe(voluntariado);
-        }
-      });
-  }
-
-  addUserSubscribe(voluntariado: Voluntariado) {
-    console.log(this.userForm.value);
->>>>>>> 41756b473077f3539fac2e4afcb13a11758aa12f
     this.authService.addUser(this.userForm.value).subscribe((result) => {
       console.log(result);
       this.voluntariadoService
-        .subscribirse(result.user.id, voluntariado.id)
+        .subscribirse(result.id, voluntariado.id)
         .subscribe(
           (result) => {
             console.log(result);
+            this.messages = result.message
+            this.ngOnInit();
+            this.userForm.reset();
           },
           (error) => {
             this.errors = error.error;
           }
         );
     });
-<<<<<<< HEAD
-=======
   }
 
-  subscribirse(valuntariado: Voluntariado) {
-    var userId = this.user.id;
-    console.log(userId);
-    this.voluntariadoService.subscribirse(userId, valuntariado.id).subscribe(
-      (result) => {
-        console.log(result);
-      },
-      (error) => {
-        this.errors = error.error;
-      }
-    );
+  getEmpresas() {
+    this.empresaService.index().subscribe((result) => {
+      this.empresas = result;
+      console.log(result);
+      this.messages = result.message
+    },
+    (error) => {
+      this.errors = error.error;
+    })
   }
 
   save() {
-    parseInt(this.addVoluntariadoForm.value.empresa_id)
-    this.voluntariadoService.create(this.addVoluntariadoForm.value).subscribe(
+    const formData = new FormData();
+    formData.append('image', this.selectImage);
+    formData.append('ciudad', this.addVoluntariadoForm.value.ciudad);
+    formData.append('descripcion', this.addVoluntariadoForm.value.descripcion);
+    formData.append('empresa', this.addVoluntariadoForm.value.empresa)
+
+    this.voluntariadoService.create(formData).subscribe(
       (result) => {
         console.log(result);
+        this.messages = result.message
         this.ngOnInit();
+        this.addVoluntariadoForm.reset();
       },
       (error) => {
         this.errors = error.error;
@@ -178,6 +175,7 @@ export class VoluntariadoComponent implements OnInit {
     this.voluntariadoService.delete(idVol).subscribe(
       (result) => {
         console.log(result);
+        this.messages = result.message
         this.ngOnInit();
       },
       (error) => {
@@ -191,12 +189,22 @@ export class VoluntariadoComponent implements OnInit {
   }
 
   update() {
+    const formData = new FormData();
+    if(this.selectImage != undefined) {
+      formData.append('image', this.selectImage);
+    }
+    formData.append('ciudad', this.updateVoluntariadoForm.value.ciudad);
+    formData.append('descripcion', this.updateVoluntariadoForm.value.descripcion);
+    formData.append('empresa_id', this.updateVoluntariadoForm.value.empresa_id)
+
     this.voluntariadoService
-      .update(this.updateVoluntariadoForm.value)
+      .update(this.updateVoluntariado.id, formData)
       .subscribe(
         (result) => {
           console.log(result);
+          this.messages = result.message
           this.ngOnInit();
+          this.updateVoluntariadoForm.reset();
         },
         (error) => {
           this.errors = error.error;
@@ -204,11 +212,13 @@ export class VoluntariadoComponent implements OnInit {
       );
   }
 
-  getEmpresas() {
-    this.empresaService.index().subscribe(data => {
-      this.empresas = data;
-      console.log(this.empresas);
+  selectedImage(event: any) {
+    this.selectImage = event.target.files[0];
+  }
+
+  getUserVoluntariado(voluntariado: Voluntariado) {
+    this.voluntariadoService.userVoluntariado(voluntariado).subscribe((data) => {
+      this.users = data;
     })
->>>>>>> 41756b473077f3539fac2e4afcb13a11758aa12f
   }
 }

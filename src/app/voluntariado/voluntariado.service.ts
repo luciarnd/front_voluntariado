@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { User } from '../shared/auth.service';
 import { Voluntariado } from './voluntariado';
 
 @Injectable({
@@ -19,12 +20,24 @@ export class VoluntariadoService {
     return this.http.get(`http://127.0.0.1:8000/api/voluntariado/${idVoluntariado}`)
    }
 
-   create(voluntariado: Voluntariado): Observable<any> {
-    return this.http.post('http://127.0.0.1:8000/api/voluntariado', voluntariado);
+   create(voluntariado: FormData): Observable<any> {
+    const headers = new HttpHeaders();
+    headers.append('Content-Type', 'multipart/form-data')
+    headers.append('Accept', 'application/json');
+
+    return this.http.post('http://127.0.0.1:8000/api/voluntariado', voluntariado, {
+      headers: headers
+    });
    }
 
-   update(voluntariado: Voluntariado): Observable<any> {
-    return this.http.put(`http://127.0.0.1:8000/api/voluntariado/${voluntariado.id}`, voluntariado);
+   update(idVoluntariado: number, voluntariado: FormData): Observable<any> {
+    const headers = new HttpHeaders();
+    headers.delete('Content-Type', 'multipart/form-data')
+    headers.append('Accept', 'application/json');
+
+    return this.http.post(`http://127.0.0.1:8000/api/voluntariado/${idVoluntariado}`, voluntariado, {
+      headers: headers
+    });
    }
 
    delete(idVoluntariado: number): Observable<any> {
@@ -36,5 +49,9 @@ export class VoluntariadoService {
     {
       user: user
     })
+   }
+
+   userVoluntariado(voluntariado: Voluntariado): Observable<any> {
+    return this.http.get(`http://127.0.0.1:8000/api/voluntariado/subscritos/${voluntariado.id}`)
    }
 }

@@ -6,4 +6,5 @@ export interface Voluntariado {
   ciudad: string,
   empresa: Empresa,
   subscrito: boolean;
+  image: string;
 }

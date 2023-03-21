@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { User } from './components/user-profile/user-profile.component';
 import { AuthStateService } from './shared/auth-state.service';
 import { AuthService } from './shared/auth.service';
+import { TokenService } from './shared/token.service';
 
 @Component({
   selector: 'app-root',
@@ -12,16 +13,14 @@ export class AppComponent {
   title = 'front_voluntariado';
   loggedUser!: boolean;
 
-  constructor(private auth: AuthStateService, private authService: AuthService) {
+  constructor(private auth: AuthStateService, private authService: AuthService, public token: TokenService) {
     this.auth.userAuthState.subscribe((val) => {
       this.loggedUser = val;
     })
   }
 
   logout(user: any) {
-    this.authService.profileUser().subscribe(data => {
-      user = data;
-    })
-    this.authService.logout(user);
+    this.auth.setAuthState(false);
+    this.token.removeToken();
   }
 }
